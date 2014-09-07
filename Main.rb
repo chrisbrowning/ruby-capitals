@@ -2,7 +2,7 @@ require 'json'
 require 'csv'
 require 'rest-client'
 
-codes  = CSV.read('/home/lenny/Documents/capitals/countrycodes.csv').flatten
+codes  = CSV.read('countrycodes.csv').flatten
 rnd = rand(codes.length)
 country = codes[rnd]
 URL = "http://api.worldbank.org/countries/#{country}?format=json"
