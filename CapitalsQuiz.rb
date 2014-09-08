@@ -9,11 +9,19 @@ class Quiz
 		@rnd = rand(@codes.length)
 		@country_code = @codes[@rnd]
 		@URL = "http://api.worldbank.org/countries/#{@country_code}?format=json"
+		print "Getting next question...(#{@country_code})\n"
 		@response = RestClient.get @URL
+		while @response.nil? do
+			@response = RestClient.get @URL
+		end
 		@jsonData = JSON.parse(@response)
-		@capital =  @jsonData[1][0]["capitalCity"]
 		@country = @jsonData[1][0]["name"]
-
+		if @jsonData[1][0]["capitalCity"].nil?
+			@capital = "SKIP"
+			print "#{@country} does not have a capital city. Type SKIP"
+		else 
+			@capital =  @jsonData[1][0]["capitalCity"]
+		end
 	end
 	
 	def question 
