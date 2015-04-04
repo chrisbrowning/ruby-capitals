@@ -3,46 +3,62 @@ require 'csv'
 require 'rest-client'
 
 class Quiz
-	
-	def initialize		
-		@codes  = CSV.read('countrycodes.csv').flatten
-		@rnd = rand(@codes.length)
-		@country_code = @codes[@rnd]
-		@URL = "http://api.worldbank.org/countries/#{@country_code}?format=json"
-		print "Getting next question...(#{@country_code})\n"
-		@response = RestClient.get @URL
-		while @response.nil? do
-			@response = RestClient.get @URL
-		end
-		@jsonData = JSON.parse(@response)
-		@country = @jsonData[1][0]["name"]
-		if @jsonData[1][0]["capitalCity"].nil?
-			@capital = "SKIP"
-			print "#{@country} does not have a capital city. Type SKIP"
-		else 
-			@capital =  @jsonData[1][0]["capitalCity"]
+
+	$country_count = 300
+
+	def load_data()
+		@URL = "http://api.worldbank.org/countries/all/?format=json&per_page=#{$country_count}"
+		response = RestClient.get @URL
+		json_response = JSON.parse(response)[1]
+		country_data = []
+		json_response.each do |country|
+			country_data << country
 		end
 	end
-	
-	def question 
-		puts "What is the capital of #{@country}?"
-		@guess = gets.chomp
-		if @guess == @capital
-			print "Correct!\n"
-		elsif @guess == "QUIT"
-			abort("Bye!")	
-		else	
-			print "Wrong! #{@country}'s capital is #{@capital}\n"
+
+	def answer_question(data)
+		country = data["name"]
+		capital = data["capitalCity"]
+		unless capital == ""
+			puts "What is the capital of #{country}?\n"
+			guess = gets.chomp
+			if guess == capital
+				puts "Correct!\n"
+				return true
+			else
+				puts "Incorrect! The capital of #{country} is #{capital}\n"
+				return false
+			end
+		else
+			# do nothing
+		end
+	end
+
+	def start_quiz()
+		questions_asked = 0
+		questions_right = 0
+		counter = 0
+		country_data = load_data()
+		while 1==1
+			rand_index = rand(country_data.length-1)
+			if_correct = answer_question(country_data[rand_index])
+			unless if_correct.nil?
+				questions_asked += 1
+				counter += 1
+				if if_correct
+					questions_right += 1
+				end
+				amt_right = questions_right.fdiv(questions_asked)*100
+				puts "So far you have #{amt_right}% right!" if questions_asked % 5 == 0
+			end
 		end
 	end
 end
 
 puts "Start quiz? y/n"
 yn = gets.chomp
-if yn == 'y' || yn == 'Y'
-	until 1==2 do
-		Quiz.new.question
-	end
+if yn.casecmp('y')
+		Quiz.new.start_quiz
 else
 	abort("Bye!")
 end
