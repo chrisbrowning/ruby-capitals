@@ -4,10 +4,10 @@ require 'rest-client'
 
 class Quiz
 
-	$country_count = 300
-
+	# load world bank api data into array
 	def load_data()
-		@URL = "http://api.worldbank.org/countries/all/?format=json&per_page=#{$country_count}"
+		country_count = 300
+		@URL = "http://api.worldbank.org/countries/all/?format=json&per_page=#{country_count}"
 		response = RestClient.get @URL
 		json_response = JSON.parse(response)[1]
 		country_data = []
@@ -16,6 +16,7 @@ class Quiz
 		end
 	end
 
+	# display question based on data
 	def answer_question(data)
 		country = data["name"]
 		capital = data["capitalCity"]
@@ -39,15 +40,18 @@ class Quiz
 		questions_right = 0
 		counter = 0
 		country_data = load_data()
+		# go forever
 		while 1==1
 			rand_index = rand(country_data.length-1)
 			if_correct = answer_question(country_data[rand_index])
+			# controls for situations when no capital exists
 			unless if_correct.nil?
 				questions_asked += 1
 				counter += 1
 				if if_correct
 					questions_right += 1
 				end
+				# performance tracking
 				amt_right = questions_right.fdiv(questions_asked)*100
 				puts "So far you have #{amt_right}% right!" if questions_asked % 5 == 0
 			end
