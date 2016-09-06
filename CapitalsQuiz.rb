@@ -1,6 +1,7 @@
 require 'json'
 require 'csv'
 require 'rest-client'
+require 'levenshtein'
 
 class Quiz
 
@@ -23,7 +24,7 @@ class Quiz
 		unless capital == ""
 			puts "What is the capital of #{country}?\n"
 			guess = gets.chomp
-			if guess == capital
+			if Levenshtein.distance(guess, capital) < 3
 				puts "Correct!\n"
 				return true
 			else
