@@ -1,6 +1,7 @@
 require 'json'
 require 'csv'
 require 'rest-client'
+require 'levenshtein'
 
 class Quiz
 
@@ -23,7 +24,21 @@ class Quiz
 		unless capital == ""
 			puts "What is the capital of #{country}?\n"
 			guess = gets.chomp
-			if guess == capital
+
+      # abort program if "EXIT"
+			if guess == "EXIT"
+			  abort("Bye!")
+			end
+
+			# handle blank answers
+			if guess == ""
+				puts "Incorrect! The capital of #{country} is #{capital}\n"
+				return false
+			end
+
+			# allows up to 2 incorrect letters in answer
+			# lower each string, and remove non-alphanumerics
+			if Levenshtein.distance(guess.downcase.gsub(/[^a-z0-9\s]/i), capital.downcase.gsub(/[^a-z0-9\s]/i)) < 3
 				puts "Correct!\n"
 				return true
 			else
@@ -36,6 +51,7 @@ class Quiz
 	end
 
 	def start_quiz()
+		puts "Welcome!...type EXIT to end quiz"
 		questions_asked = 0
 		questions_right = 0
 		counter = 0
