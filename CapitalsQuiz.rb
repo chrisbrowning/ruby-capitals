@@ -38,9 +38,13 @@ class Quiz
 
       # allows up to 2 incorrect letters in answer
       # lower each string, and remove non-alphanumerics
-      if Levenshtein.distance(guess.downcase.gsub(/[^a-z0-9\s]/i), capital.downcase.gsub(/[^a-z0-9\s]/i)) < 3
-        puts "Correct!\n"
+			leven_distance = Levenshtein.distance(guess.downcase.gsub(/[^A-Za-z0-9\s]/i,''), capital.downcase.gsub(/[^A-Za-z0-9\s]/i,''))
+      if leven_distance < 3 && leven_distance > 0
+				puts "Your answer was off but we'll accept it! The capital of #{country} is #{capital}\n"
         return true
+			elsif leven_distance == 0
+				  puts "Correct!\n"
+					return true
       else
         puts "Incorrect! The capital of #{country} is #{capital}\n"
         return false
@@ -77,7 +81,7 @@ end
 
 puts "Start quiz? y/n"
 yn = gets.chomp
-if yn.casecmp('y')
+if yn == 'y' || yn == 'Y'
   Quiz.new.start_quiz
 else
   abort("Bye!")
