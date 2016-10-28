@@ -64,6 +64,12 @@ end
     while 1==1
       rand_index = rand(country_data.length-1)
       if_correct = answer_question(country_data[rand_index])
+      #country_data[rand_index]
+      #remove the country that was just asked
+      to_delete = country_data[rand_index]
+      id_to_remove = to_delete['id'.to_sym]
+      country_data = country_data.delete_if { |h| h["id"] == id_to_remove }
+
       # controls for situations when no capital exists
       unless if_correct.nil?
         questions_asked += 1
