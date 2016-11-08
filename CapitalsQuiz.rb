@@ -2,7 +2,6 @@ require 'json'
 require 'csv'
 require 'rest-client'
 require 'levenshtein'
-require 'pry'
 
 class Quiz
 
