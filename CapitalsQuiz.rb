@@ -60,28 +60,25 @@ end
     questions_right = 0
     counter = 0
     country_data = load_data()
+    country_data.shuffle!
     # go forever
-    while 1==1
-      rand_index = rand(country_data.length-1)
-      if_correct = answer_question(country_data[rand_index])
-      #country_data[rand_index]
-      #remove the country that was just asked
-      to_delete = country_data[rand_index]
-      id_to_remove = to_delete["id"].to_sym
-      country_data = country_data.delete_if { |h| h["id"] == id_to_remove }
+    for c in country_data
+      country_for_question = country_data.pop
+      if_correct = answer_question(country_for_question)
 
       # controls for situations when no capital exists
       unless if_correct.nil?
-        questions_asked += 1
-        counter += 1
-        if if_correct
-          questions_right += 1
-        end
-        # performance tracking
-        amt_right = questions_right.fdiv(questions_asked)*100
-        puts "So far you have #{amt_right}% right!" if questions_asked % 5 == 0
+          questions_asked += 1
+          counter += 1
+          if if_correct
+            questions_right += 1
+          end
+          # performance tracking
+          amt_right = questions_right.fdiv(questions_asked)*100
+          puts "So far you have #{amt_right}% right!" if questions_asked % 5 == 0
       end
     end
+  abort("All countries asked! You got #{amt_right} right!")
   end
 end
 
