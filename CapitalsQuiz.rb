@@ -2,6 +2,7 @@ require 'json'
 require 'csv'
 require 'rest-client'
 require 'levenshtein'
+require 'pry'
 
 class Quiz
 
@@ -73,6 +74,10 @@ end
           if if_correct
             questions_right += 1
           end
+          #remove the country that was just asked
+          to_delete = country_for_question
+          id_to_remove = to_delete['id']
+          country_data = country_data.delete_if { |h| h["id"] == id_to_remove }
           # performance tracking
           amt_right = questions_right.fdiv(questions_asked)*100
           puts "So far you have #{amt_right}% right!" if questions_asked % 5 == 0
