@@ -19,11 +19,15 @@ class Quiz
   end
 
   # display question based on data
-  def answer_question(data)
+  def answer_question(data, mode)
     country = data["name"]
     capital = data["capitalCity"]
     unless capital == ""
-      puts "What is the capital of #{country}?\n"
+      if mode == "xmode"
+        puts "#{capital} is the capital of what country?\n"
+      else
+        puts "What is the capital of #{country}?\n"
+      end
       guess = gets.chomp
 
       # abort program if "EXIT"
@@ -39,15 +43,27 @@ class Quiz
 
       # allows up to 2 incorrect letters in answer
       # lower each string, and remove non-alphanumerics
-			leven_distance = Levenshtein.distance(guess.downcase.gsub(/[^A-Za-z0-9\s]/i,''), capital.downcase.gsub(/[^A-Za-z0-9\s]/i,''))
+      if mode == "xmode"
+        leven_distance = Levenshtein.distance(guess.downcase.gsub(/[^A-Za-z0-9\s]/i,''), country.downcase.gsub(/[^A-Za-z0-9\s]/i,''))
+      else
+			  leven_distance = Levenshtein.distance(guess.downcase.gsub(/[^A-Za-z0-9\s]/i,''), capital.downcase.gsub(/[^A-Za-z0-9\s]/i,''))
+      end
       if leven_distance < 3 && leven_distance > 0
-				puts "Your answer was off but we'll accept it! The capital of #{country} is #{capital}\n"
+        if mode == "xmode"
+          puts "Your answer was off but we'll accept it! #{capital} is the capital of #{country}\n"
+        else
+				  puts "Your answer was off but we'll accept it! The capital of #{country} is #{capital}\n"
+        end
         return true
 			elsif leven_distance == 0
 				  puts "Correct!\n"
 					return true
       else
-        puts "Incorrect! The capital of #{country} is #{capital}\n"
+        if mode == "xmode"
+          puts "Incorrect! #{capital} is the capital of #{country}\n"
+        else
+          puts "Incorrect! The capital of #{country} is #{capital}\n"
+        end
         return false
       end
   else
@@ -55,7 +71,7 @@ class Quiz
   end
 end
 
-  def start_quiz()
+  def start_quiz(mode)
     puts "Welcome!...type EXIT to end quiz"
     questions_asked = 0
     questions_right = 0
@@ -65,7 +81,7 @@ end
     # go forever
     for c in country_data
       country_for_question = country_data.pop
-      if_correct = answer_question(country_for_question)
+      if_correct = answer_question(country_for_question, mode)
 
       # controls for situations when no capital exists
       unless if_correct.nil?
@@ -87,10 +103,12 @@ end
   end
 end
 
-puts "Start quiz? y/n"
+puts "Start quiz? y/n... or x"
 yn = gets.chomp
 if yn == 'y' || yn == 'Y'
-  Quiz.new.start_quiz
+  Quiz.new.start_quiz(nil)
+elsif yn = 'x'  || yn == 'X'
+  Quiz.new.start_quiz("xmode")
 else
   abort("Bye!")
 end
